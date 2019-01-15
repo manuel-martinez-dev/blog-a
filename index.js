@@ -1,12 +1,12 @@
 require('dotenv').config();
-const sequelize = require('sequelize');
-const epilogue = require('epilogue'), ForbiddenError = epilogue.Errors.ForbiddenError;
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const { ExpressOIDC } = require('@okta/oidc-middleware');
+const Sequelize = require('sequelize');
+const epilogue = require('epilogue'), ForbiddenError = epilogue.Errors.ForbiddenError;
 const app = express();
 const port = 3000;
 
