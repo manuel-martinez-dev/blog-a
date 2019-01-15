@@ -1,4 +1,6 @@
 require('dotenv').config();
+const sequelize = require('sequelize');
+const epilogue = require('epilogue'), ForbiddenError = epilogue.Errors.ForbiddenError;
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -8,7 +10,7 @@ const { ExpressOIDC } = require('@okta/oidc-middleware');
 const app = express();
 const port = 3000;
 
-// session support is required to use ExpressOIDC
+// session to use ExpressOIDC
 app.use(session({
     secret: process.env.RANDOM_SECRET_WORD,
     resave: true,
@@ -29,7 +31,7 @@ const oidc = new ExpressOIDC({
     }
 });
 
-// ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
+// Attach handlers for the routes using ExpressOIDC
 app.use(oidc.router);
 app.use(cors());
 app.use(bodyParser.json());
@@ -38,8 +40,55 @@ app.get('/home', (req, res) => {
   res.send('<h1>Welcome!!</div><a href="/login">Login</a>');
 });
 
-app.get('/admin',(req, res)=>{
+app.get('/admin', oidc.ensureAuthenticated(), (req, res)=>{
   res.send('Admin page');
-})
+});
 
-app.listen(port, () => console.log(`My Blog App listening on port ${port}!`))
+app.get('/logout',(req, res)=> {
+  req.logout();
+  res.redirect('/home');
+});
+
+app.get('/',(req, res)=> {
+  res.redirect('/home');
+});
+
+const database = new Sequelize({
+    dialect: 'sqlite',
+    storage: './db.sqlite',
+    operatorsAliases: false,
+});
+
+const Post = database.define('posts', {
+    title: Sequelize.STRING,
+    content: Sequelize.TEXT,
+});
+
+epilogue.initialize({ app, sequelize: database });
+
+const PostResource = epilogue.resource({
+    model: Post,
+    endpoints: ['/posts', '/posts/:id'],
+});
+
+PostResource.all.auth(function (req, res, context) {
+    return new Promise(function (resolve, reject) {
+        if (!req.isAuthenticated()) {
+            res.status(401).send({ message: "Unauthorized" });
+            resolve(context.stop);
+        } else {
+            resolve(context.continue);
+        }
+    })
+});
+
+database.sync().then(() => {
+    oidc.on('ready', () => {
+      app.listen(port, () => console.log(`My Blog App listening on port ${port}!`))
+    });
+});
+
+oidc.on('error', err => {
+// Error setting up OIDC
+console.log("oidc error: ", err);
+});
