@@ -42,7 +42,7 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/admin', oidc.ensureAuthenticated(), (req, res)=>{
-  res.sendFile(path.join(__dirname, './public/home.html'));
+  res.sendFile(path.join(__dirname, './public/admin.html'));
 });
 
 app.get('/logout',(req, res)=> {
