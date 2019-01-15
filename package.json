@@ -1,0 +1,33 @@
+{
+  "name": "blog-a",
+  "version": "1.0.0",
+  "description": "simple blog",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manuel-martinez-dev/blog-a.git"
+  },
+  "keywords": [
+    "blog"
+  ],
+  "author": "manuel martinez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manuel-martinez-dev/blog-a/issues"
+  },
+  "homepage": "https://github.com/manuel-martinez-dev/blog-a#readme",
+  "dependencies": {
+    "@okta/oidc-middleware": "^1.0.2",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
+}
